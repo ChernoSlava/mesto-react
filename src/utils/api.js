@@ -42,11 +42,14 @@ class Api {
     }).then(this._checkResponse);
   }
 
-  postCard(card) {
+  postCard(data) {
     return fetch(`${this._url}/cards`, {
       method: "POST",
       headers: this._headers,
-      body: JSON.stringify(card),
+      body: JSON.stringify({
+        name: data.name,
+        link: data.link,
+      }),
     }).then(this._checkResponse);
   }
 
@@ -61,6 +64,10 @@ class Api {
     }).then(this._checkResponse);
   }
 
+  getInitialCards() {
+    return Promise.all([this.getUserInfoFromServer(), this.getCards()]);
+  }
+
   getCards() {
     return fetch(`${this._url}/cards`, {
       method: "GET",
@@ -70,12 +77,9 @@ class Api {
 
   getUserInfoFromServer() {
     return fetch(`${this._url}/users/me`, {
+      method: "GET",
       headers: this._headers,
     }).then(this._checkResponse);
-  }
-
-  getInitialCards() {
-    return Promise.all([this.getCards, this.getUserInfoFromServer]);
   }
 }
 
