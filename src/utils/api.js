@@ -1,0 +1,90 @@
+class Api {
+  constructor({ url, headers }) {
+    this._url = url;
+    this._headers = headers;
+  }
+
+  _checkResponse(res) {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`Что-то упало: ${res.status}`);
+  }
+
+  setUserAvatarToServer(data) {
+    return fetch(`${this._url}/users/me/avatar`, {
+      method: "PATCH",
+      headers: this._headers,
+      body: JSON.stringify({
+        avatar: data.avatar,
+      }),
+    }).then(this._checkResponse);
+  }
+
+  deleteLike(id) {
+    return fetch(`${this._url}/cards/${id}/likes`, {
+      method: "DELETE",
+      headers: this._headers,
+    }).then(this._checkResponse);
+  }
+
+  doLike(id) {
+    return fetch(`${this._url}/cards/${id}/likes`, {
+      method: "PUT",
+      headers: this._headers,
+    }).then(this._checkResponse);
+  }
+
+  deleteCard(id) {
+    return fetch(`${this._url}/cards/${id}`, {
+      method: "DELETE",
+      headers: this._headers,
+    }).then(this._checkResponse);
+  }
+
+  postCard(card) {
+    return fetch(`${this._url}/cards`, {
+      method: "POST",
+      headers: this._headers,
+      body: JSON.stringify(card),
+    }).then(this._checkResponse);
+  }
+
+  setUserInfoToServer(data) {
+    return fetch(`${this._url}/users/me`, {
+      method: "PATCH",
+      headers: this._headers,
+      body: JSON.stringify({
+        name: data.name,
+        about: data.about,
+      }),
+    }).then(this._checkResponse);
+  }
+
+  getCards() {
+    return fetch(`${this._url}/cards`, {
+      method: "GET",
+      headers: this._headers,
+    }).then(this._checkResponse);
+  }
+
+  getUserInfoFromServer() {
+    return fetch(`${this._url}/users/me`, {
+      headers: this._headers,
+    }).then(this._checkResponse);
+  }
+
+  getInitialCards() {
+    return Promise.all([this.getCards, this.getUserInfoFromServer]);
+  }
+}
+
+const api = new Api({
+  url: "https://mesto.nomoreparties.co/v1/cohort-48",
+  headers: {
+    authorization: "1b4bc79c-4655-4b7c-ab14-ef593343b332",
+    "Content-Type": "application/json",
+  },
+});
+
+export default api;
