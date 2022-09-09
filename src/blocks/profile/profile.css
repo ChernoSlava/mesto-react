@@ -7,6 +7,7 @@
   padding-left: 16%;
   padding-right: 16%;
   position: relative;
+  margin: auto;
 }
 
 @media screen and (max-width: 950px) {

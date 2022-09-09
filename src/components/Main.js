@@ -1,15 +1,15 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import profileBtn from "../images/Profile__Edit-Button.svg";
 import Card from "./Card";
 import api from "../utils/api";
 
-function Main(props) {
-  const [userName, setUserName] = React.useState("");
-  const [userDescription, setUserDescription] = React.useState("");
-  const [userAvatar, setUserAvatar] = React.useState("");
-  const [cards, setCards] = React.useState([]);
+function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick }) {
+  const [userName, setUserName] = useState("");
+  const [userDescription, setUserDescription] = useState("");
+  const [userAvatar, setUserAvatar] = useState("");
+  const [cards, setCards] = useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     api
       .getInitialCards()
       .then((info) => {
@@ -36,7 +36,7 @@ function Main(props) {
           <button
             className="profile__avatar-btn"
             type="button"
-            onClick={props.onEditAvatar}
+            onClick={onEditAvatar}
           ></button>
         </div>
 
@@ -45,7 +45,7 @@ function Main(props) {
           <button
             type="button"
             className="profile__button"
-            onClick={props.onEditProfile}
+            onClick={onEditProfile}
           >
             <img src={profileBtn} alt="Кнопка редактирования" />
           </button>
@@ -54,13 +54,13 @@ function Main(props) {
         <button
           type="button"
           className="profile__add-button"
-          onClick={props.onAddPlace}
+          onClick={onAddPlace}
         ></button>
       </section>
       <section>
         <ul className="elements">
           {cards.map((card) => (
-            <Card key={card._id} card={card} onCardClick={props.onCardClick} />
+            <Card key={card._id} card={card} onCardClick={onCardClick} />
           ))}
         </ul>
       </section>
