@@ -7,7 +7,8 @@ import ImagePopup from "./ImagePopup";
 import React from "react";
 import api from "../utils/api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
-import EditProfilePopup from './EditProfilePopup';
+import EditProfilePopup from "./EditProfilePopup";
+import EditAvatarPopup from "./EditAvatarPopup";
 
 function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] =
@@ -15,7 +16,7 @@ function App() {
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = React.useState(false);
   const [isImagePopupOpen, setImagePopupOpen] = React.useState(false);
-  
+
   const [selectedCard, setSelectedCard] = React.useState({});
   const [currentUser, setCurrentUser] = React.useState("");
 
@@ -32,6 +33,18 @@ function App() {
 
   function handlerUpdateUser(data) {
     api.setUserInfoToServer(data).then(
+      (data) => {
+        setCurrentUser(data);
+        closeAllPopups();
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
+  }
+
+  function handleUpdateAvatar(data) {
+    api.setUserAvatarToServer(data).then(
       (data) => {
         setCurrentUser(data);
         closeAllPopups();
@@ -84,7 +97,6 @@ function App() {
           onUpdateUser={handlerUpdateUser}
         />
 
-
         <PopupWithForm
           name="card"
           title="Новое место"
@@ -121,27 +133,11 @@ function App() {
           </fieldset>
         </PopupWithForm>
 
-        <PopupWithForm
-          name="avatar"
-          title="Обновить Аватар"
+        <EditAvatarPopup
           isOpen={isEditAvatarPopupOpen}
           onClose={closeAllPopups}
-          btnClass={"avatar"}
-          buttonText={"Сохранить"}
-        >
-          <fieldset className="popup__set">
-            <input
-              type="url"
-              name="avatar"
-              className="popup__field popup__field_type_avatar"
-              placeholder="Ссылка на картинку"
-              required
-            />
-            <span className="popup__field-error popup__field-error_field_avatar">
-              Необходимо заполнить данное поле
-            </span>
-          </fieldset>
-        </PopupWithForm>
+          onUpdateAvatar={handleUpdateAvatar}
+        />
 
         <PopupWithForm
           name="delete-card"
