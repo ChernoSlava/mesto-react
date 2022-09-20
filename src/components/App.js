@@ -4,23 +4,25 @@ import Main from "./Main";
 import Footer from "./Footer";
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
-import React from "react";
+import { useState, useEffect } from 'react';
 import api from "../utils/api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
+import AddPlacePopup from "./AddPlacePopup";
 
 function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] =
-    React.useState(false);
-  const [isAddPlacePopupOpen, setAddPlacePopupOpen] = React.useState(false);
-  const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = React.useState(false);
-  const [isImagePopupOpen, setImagePopupOpen] = React.useState(false);
+    useState(false);
+  const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
+  const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
+  const [isImagePopupOpen, setImagePopupOpen] = useState(false);
 
-  const [selectedCard, setSelectedCard] = React.useState({});
-  const [currentUser, setCurrentUser] = React.useState("");
+  const [selectedCard, setSelectedCard] = useState({});
+  const [currentUser, setCurrentUser] = useState("");
+  const [cards, setCards] = useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     api
       .getUserInfoFromServer()
       .then((data) => {
@@ -55,6 +57,55 @@ function App() {
     );
   }
 
+   function handleCardLike(card) {
+     const isLiked = card.likes.some((i) => i._id === currentUser._id);
+     api
+       .changeLikeCardStatus(card._id, isLiked)
+       .then((newCard) => {
+         const newCards = cards.map((currentCard) =>
+           currentCard._id === card._id ? newCard : currentCard
+         );
+         setCards(newCards);
+       })
+       .catch((err) => {
+         console.log(err);
+       });
+   }
+
+   function handleCardDelete(card) {
+     api
+       .deleteCard(card._id)
+       .then(() => {
+         const newCard = cards.filter((e) => e !== card);
+         setCards(newCard);
+       })
+       .catch((err) => {
+         console.log(err);
+       });
+   }
+
+   function handleAddPlaceSubmit(data) {
+    api.postCard(data).then((newCard) => {
+       setCards([newCard, ...cards]); 
+        closeAllPopups();
+    },
+    (err) => {
+      console.log(err);
+    }
+    );
+  }
+
+  useEffect(() => {
+    api
+      .getCards()
+      .then((info) => {
+        setCards(info);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(!isEditAvatarPopupOpen);
   }
@@ -84,6 +135,9 @@ function App() {
       <div className="page">
         <Header />
         <Main
+          cards={cards}
+          onCardDelete={handleCardDelete}
+          onCardLike={handleCardLike}
           onEditProfile={handleEditProfileClick}
           onAddPlace={handleAddPlaceClick}
           onEditAvatar={handleEditAvatarClick}
@@ -97,41 +151,11 @@ function App() {
           onUpdateUser={handlerUpdateUser}
         />
 
-        <PopupWithForm
-          name="card"
-          title="Новое место"
+        <AddPlacePopup
           isOpen={isAddPlacePopupOpen}
           onClose={closeAllPopups}
-          btnClass={"form-card-btn"}
-          buttonText={"Создать"}
-        >
-          <fieldset className="popup__set">
-            <input
-              id="title"
-              type="text"
-              name="title"
-              className="popup__field popup__field_type_title"
-              placeholder="Название"
-              minLength="2"
-              maxLength="30"
-              required
-            />
-            <span className="popup__field-error popup__field-error_field_title">
-              Необходимо заполнить данное поле
-            </span>
-            <input
-              id="url"
-              type="url"
-              name="link"
-              className="popup__field popup__field_type_link"
-              placeholder="Ссылка на картинку"
-              required
-            />
-            <span className="popup__field-error popup__field-error_field_link">
-              Необходимо заполнить данное поле
-            </span>
-          </fieldset>
-        </PopupWithForm>
+          onAddPlace={handleAddPlaceSubmit}
+        />
 
         <EditAvatarPopup
           isOpen={isEditAvatarPopupOpen}
