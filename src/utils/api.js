@@ -20,7 +20,14 @@ class Api {
       }),
     }).then(this._checkResponse);
   }
-
+  changeLikeCardStatus(id, isLiked) {
+      if (isLiked) {
+      return this.deleteLike(id);
+    } else {
+      return this.doLike(id);
+    }
+  }
+  
   deleteLike(id) {
     return fetch(`${this._url}/cards/${id}/likes`, {
       method: "DELETE",
