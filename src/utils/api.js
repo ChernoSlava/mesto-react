@@ -11,23 +11,21 @@ class Api {
     return Promise.reject(`Что-то упало: ${res.status}`);
   }
 
-  setUserAvatarToServer(data) {
+  setUserAvatarToServer(avatar) {
     return fetch(`${this._url}/users/me/avatar`, {
       method: "PATCH",
       headers: this._headers,
-      body: JSON.stringify({
-        avatar: data.avatar,
-      }),
+      body: JSON.stringify(avatar),
     }).then(this._checkResponse);
   }
   changeLikeCardStatus(id, isLiked) {
-      if (isLiked) {
+    if (isLiked) {
       return this.deleteLike(id);
     } else {
       return this.doLike(id);
     }
   }
-  
+
   deleteLike(id) {
     return fetch(`${this._url}/cards/${id}/likes`, {
       method: "DELETE",
@@ -53,10 +51,7 @@ class Api {
     return fetch(`${this._url}/cards`, {
       method: "POST",
       headers: this._headers,
-      body: JSON.stringify({
-        name: data.name,
-        link: data.link,
-      }),
+      body: JSON.stringify(data),
     }).then(this._checkResponse);
   }
 
@@ -64,10 +59,7 @@ class Api {
     return fetch(`${this._url}/users/me`, {
       method: "PATCH",
       headers: this._headers,
-      body: JSON.stringify({
-        name: data.name,
-        about: data.about,
-      }),
+      body: JSON.stringify(data),
     }).then(this._checkResponse);
   }
 

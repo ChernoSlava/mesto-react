@@ -1,6 +1,8 @@
 import { useContext } from "react";
-import profileBtn from "../images/Profile__Edit-Button.svg";
+
 import Card from "./Card";
+import profileBtn from "../images/Profile__Edit-Button.svg";
+
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
 function Main({

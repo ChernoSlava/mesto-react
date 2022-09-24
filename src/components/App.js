@@ -1,15 +1,19 @@
-import ".././index";
+import { useState, useEffect } from "react";
+
+import ".././index.css";
+
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
 import ImagePopup from "./ImagePopup";
-import { useState, useEffect } from "react";
-import api from "../utils/api";
-import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
 import ConfirmPopup from "./ConfirmPopup";
+
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+
+import api from "../utils/api";
 
 function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
@@ -17,17 +21,19 @@ function App() {
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
   const [isImagePopupOpen, setImagePopupOpen] = useState(false);
   const [isConfirmPopupOpen, setConfirmPopupOpen] = useState(false);
-  const [cardForDelete, setCardForDelete] = useState({});
 
-  const [selectedCard, setSelectedCard] = useState({});
-  const [currentUser, setCurrentUser] = useState("");
   const [cards, setCards] = useState([]);
 
+  const [selectedCard, setSelectedCard] = useState({});
+  const [cardForDelete, setCardForDelete] = useState({});
+  const [currentUser, setCurrentUser] = useState({});
+
   useEffect(() => {
-    api
-      .getUserInfoFromServer()
-      .then((data) => {
-        setCurrentUser(data);
+    Promise.all([api.getUserInfoFromServer(), api.getCards()])
+
+      .then(([user, cards]) => {
+        setCurrentUser(user);
+        setCards(cards);
       })
       .catch((err) => {
         console.log(err);
@@ -35,27 +41,27 @@ function App() {
   }, []);
 
   function handlerUpdateUser(data) {
-    api.setUserInfoToServer(data).then(
-      (data) => {
+    api
+      .setUserInfoToServer(data)
+      .then((data) => {
         setCurrentUser(data);
         closeAllPopups();
-      },
-      (err) => {
+      })
+      .catch((err) => {
         console.log(err);
-      }
-    );
+      });
   }
 
   function handleUpdateAvatar(data) {
-    api.setUserAvatarToServer(data).then(
-      (data) => {
+    api
+      .setUserAvatarToServer(data)
+      .then((data) => {
         setCurrentUser(data);
         closeAllPopups();
-      },
-      (err) => {
+      })
+      .catch((err) => {
         console.log(err);
-      }
-    );
+      });
   }
 
   function handleCardLike(card) {
@@ -88,27 +94,16 @@ function App() {
   }
 
   function handleAddPlaceSubmit(data) {
-    api.postCard(data).then(
-      (newCard) => {
+    api
+      .postCard(data)
+      .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
-  }
-
-  useEffect(() => {
-    api
-      .getCards()
-      .then((info) => {
-        setCards(info);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }
 
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(!isEditAvatarPopupOpen);

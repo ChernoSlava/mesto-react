@@ -1,10 +1,15 @@
 import { useState } from "react";
+
 import PopupWithForm from "./PopupWithForm";
 
 export default function AddPlacePopup({ onAddPlace, isOpen, onClose }) {
   const [name, setName] = useState("");
   const [link, setLink] = useState("");
 
+  function resetForm() {
+    setName("");
+    setLink("");
+  }
   function handleChangeName(e) {
     setName(e.target.value);
   }
@@ -15,18 +20,20 @@ export default function AddPlacePopup({ onAddPlace, isOpen, onClose }) {
   function handleSubmit(e) {
     e.preventDefault();
     onAddPlace({
-      name: name,
-      link: link,
+      name,
+      link,
     });
+    resetForm();
   }
+
   return (
     <PopupWithForm
       name="card"
       title="Новое место"
       isOpen={isOpen}
       onClose={onClose}
-      btnClass={"form-card-btn"}
-      buttonText={"Создать"}
+      btnClass="form-card-btn"
+      buttonText="Создать"
       onSubmit={handleSubmit}
     >
       <fieldset className="popup__set">
