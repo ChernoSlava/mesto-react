@@ -41,7 +41,7 @@ function Main({
           >
             <img src={profileBtn} alt="Кнопка редактирования" />
           </button>
-          <p className="profile__subtitle">{currentUser.description}</p>
+          <p className="profile__subtitle">{currentUser.about}</p>
         </div>
         <button
           type="button"
